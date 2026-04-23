@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld('api', {
   openFolder: (path) => ipcRenderer.invoke('open-folder', path),
   openUrl: (url) => ipcRenderer.invoke('open-url', url),
   focusWindow: () => ipcRenderer.invoke('focus-window'),
+  getLinks: () => ipcRenderer.invoke('store-get-links'),
+  setLinks: (groups) => ipcRenderer.invoke('store-set-links', groups),
   getNotes: () => ipcRenderer.invoke('store-get-notes'),
   setNote: (key, note) => ipcRenderer.invoke('store-set-note', key, note),
   deleteNote: (key) => ipcRenderer.invoke('store-delete-note', key),

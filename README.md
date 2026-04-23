@@ -11,10 +11,10 @@ The project uses Electron Forge + Vite for development and packaging.
 
 ### Links tab
 
-- Displays shortcut groups defined in `src/storage/links.js`
+- Loads shortcut groups from app storage, seeded from `src/storage/links.js`
 - Opens folders and files through Electron shell APIs
 - Opens web links in the default browser
-- Supports drag-and-drop reordering inside a group during the current session
+- Persists drag-and-drop reordering inside each group
 
 ### Calendar tab
 
@@ -60,13 +60,13 @@ The project uses Electron Forge + Vite for development and packaging.
 ### Electron side
 
 - `src/main.js` creates the main window
-- IPC handlers expose file opening, URL opening, window focusing, and calendar note storage
-- Notes are stored through `electron-store`
+- IPC handlers expose file opening, URL opening, window focusing, launcher storage, and calendar note storage
+- Launcher groups and notes are stored through `electron-store`
 
 ### Renderer side
 
 - `src/App.vue` switches between the Links and Calendar tabs
-- `src/components/LinkConsole.vue` renders shortcut groups from static source data
+- `src/components/LinkConsole.vue` loads, renders, and persists shortcut group ordering
 - `src/components/Calendar.vue` handles calendar generation, note editing, and note persistence
 
 ### Preload bridge
@@ -76,6 +76,8 @@ The project uses Electron Forge + Vite for development and packaging.
 - `openFolder(path)`
 - `openUrl(url)`
 - `focusWindow()`
+- `getLinks()`
+- `setLinks(groups)`
 - `getNotes()`
 - `setNote(key, note)`
 - `deleteNote(key)`
@@ -113,16 +115,16 @@ This launches Electron through Electron Forge and starts the Vite dev server for
 
 ## Configuring the Links Tab
 
-Shortcut groups are defined in `src/storage/links.js`.
+Default shortcut groups are defined in `src/storage/links.js`.
 
 Current shape:
 
 ```js
-const groups = [
+export const defaultLinkGroups = [
   {
-    type: "folder", // "folder" | "file" | "url"
+    type: "url", // "folder" | "file" | "url"
     items: [
-      { id: 1, name: "Example", path: "/absolute/path/or/url" }
+      { id: 1, name: "Example", path: "https://example.com" }
     ]
   }
 ];
@@ -135,11 +137,15 @@ const groups = [
 - `path` should be a full URL for `url`
 - `id` is used for ordering and drag list identity
 
-After editing `src/storage/links.js`, restart the development server if it is already running.
+At first launch, or when no stored launcher data exists yet, the app seeds its launcher state from these defaults.
+
+After that, the current launcher order is stored in the app config and survives restarts.
+
+After editing `src/storage/links.js`, restart the development server if it is already running. To reseed from the new defaults, delete the stored `linkGroups` value from the app config file.
 
 ## Calendar Data Storage
 
-Calendar notes are stored with `electron-store` under the app's user data directory.
+Launcher groups and calendar notes are stored with `electron-store` under the app's user data directory.
 
 Example on Linux:
 
@@ -147,7 +153,9 @@ Example on Linux:
 ~/.config/convigui/config.json
 ```
 
-Each note is stored under a `YYYY-MM-DD` key with this shape:
+Launcher state is stored under `linkGroups`.
+
+Calendar notes are stored under `calendarNotes`, with each note using this shape:
 
 ```json
 {
@@ -173,7 +181,6 @@ Current makers:
 ## Current Limitations
 
 - Link entries are static source code, not user-editable from the UI
-- Link order changes are not persisted between app launches
 - There is no automated test suite
 - There is no real lint or formatting pipeline configured
 - Some UI copy is mixed between English and Russian
@@ -182,7 +189,6 @@ Current makers:
 ## Suggested Next Steps
 
 - Move link configuration out of source code into persisted app data
-- Persist drag-and-drop order for launcher items
 - Add linting and at least a small smoke-test workflow
 - Clean up unused component files
 - Make package metadata and branding production-ready
