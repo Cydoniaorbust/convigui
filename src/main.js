@@ -2,8 +2,21 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import Store from 'electron-store';
+import { cloneLinkGroups } from './storage/links.js';
 
 const store = new Store();
+
+const getStoredLinkGroups = () => {
+  const storedLinkGroups = store.get('linkGroups');
+
+  if (Array.isArray(storedLinkGroups)) {
+    return storedLinkGroups;
+  }
+
+  const defaultLinkGroups = cloneLinkGroups();
+  store.set('linkGroups', defaultLinkGroups);
+  return defaultLinkGroups;
+};
 
 ipcMain.handle('open-folder', async (_, folderPath) => {
   console.log('open-folder:', folderPath);
@@ -46,6 +59,14 @@ ipcMain.handle('store-delete-note', async (_, key) => {
   store.set('calendarNotes', notes);
 });
 
+ipcMain.handle('store-get-links', async () => {
+  return getStoredLinkGroups();
+});
+
+ipcMain.handle('store-set-links', async (_, groups) => {
+  store.set('linkGroups', groups);
+});
+
 if (started) {
   app.quit();
 }
@@ -55,7 +76,10 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
       preload: path.join(__dirname, 'preload.js'),
+      sandbox: true,
     },
   });
 

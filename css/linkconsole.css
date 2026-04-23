@@ -53,6 +53,21 @@ button:hover, .item:hover {
 	background: #4a76a8;
 }
 
+.links > .links-empty {
+	background: #333;
+	border: 1px dashed #555;
+	border-radius: 10px;
+	color: #f2ebb8;
+	padding: 2rem;
+	text-align: center;
+}
+
+.links > .links-empty code {
+	background: #222;
+	border-radius: 4px;
+	padding: 0.1rem 0.35rem;
+}
+
 .no-move {
 	transition: transform 0s;
 }
@@ -64,4 +79,3 @@ button:hover, .item:hover {
 .flip-list-move {
 	transition: transform 0.3s;
 }
-
