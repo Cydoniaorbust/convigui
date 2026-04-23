@@ -74,7 +74,7 @@
 	<div v-if="showNoteDialog" class="modal-overlay" @click.self="closeNoteDialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h2>{{ editingNoteDate ? 'Edit Note' : 'Add Note' }}</h2>
+				<h2>{{ isEditingExistingNote ? 'Edit Note' : 'Add Note' }}</h2>
 				<button class="close-btn" @click="closeNoteDialog">✕</button>
 			</div>
 			<div class="modal-body">
@@ -104,7 +104,7 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn-cancel" @click="closeNoteDialog">Cancel</button>
-				<button v-if="editingNoteDate" class="btn-delete" @click="deleteCurrentNote">Delete</button>
+				<button v-if="isEditingExistingNote" class="btn-delete" @click="deleteCurrentNote">Delete</button>
 				<button class="btn-save" @click="saveNote">Save</button>
 			</div>
 		</div>
@@ -141,6 +141,7 @@ export default {
 			// Note dialog state
 			showNoteDialog: false,
 			editingNoteDate: null,
+			isEditingExistingNote: false,
 			noteText: '',
 			noteColor: '#FFD93D',
 			colorOptions: [
@@ -231,12 +232,10 @@ export default {
 		},
 		openNoteDialog(date, note = null) {
 			this.editingNoteDate = date
+			this.isEditingExistingNote = Boolean(note)
 			this.noteText = note?.text || ''
 			this.noteColor = note?.color || '#FFD93D'
-
-			setTimeout(() => {
-				this.showNoteDialog = true
-			}, 0)
+			this.showNoteDialog = true
 		},
 		handleDayClick(day) {
 			if (!day.currentMonth) {
@@ -252,13 +251,7 @@ export default {
 			if (existingNote) {
 				this.openNoteDialog(date, existingNote)
 			} else {
-				if (confirm('Add a note for this day?')) {
-					this.openNoteDialog(date)
-
-					requestAnimationFrame(() => {
-						document.body.style.transform = 'scale(1)'
-					})
-				}
+				this.openNoteDialog(date)
 			}
 
 			this.selectedDate = date
@@ -296,6 +289,7 @@ export default {
 		closeNoteDialog() {
 			this.showNoteDialog = false
 			this.editingNoteDate = null
+			this.isEditingExistingNote = false
 			this.noteText = ''
 			this.noteColor = '#FFD93D'
 		},
