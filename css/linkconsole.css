@@ -1,0 +1,67 @@
+button {
+	background: #333;
+	border: none;
+	border-radius: 10px;
+	box-sizing: border-box;
+	color: inherit;
+	cursor: pointer;
+	padding: 20px 10px;
+	width: 100%;
+}
+button:hover, .item:hover {
+	background: #f2ebb8;
+	color: #222222;
+}
+
+.item {
+	align-items: center;
+	background: #333;
+	border-radius: 10px;
+	display: flex;
+}
+.item button {
+	background: none;
+}
+.drag-handle {
+	cursor: grab;
+	padding: 1em 10px;
+	user-select: none;
+}
+
+.links {
+	gap: 20px;
+	padding: 10px;
+	width: 75%;
+}
+.links > div {
+	gap: 5px;
+	padding: 2%;
+}
+.content {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 5px;
+	margin-top: 5px;
+}
+.links > .file {
+	background: #4faf7f;
+}
+.links > .folder {
+	background: #ffe964;
+}
+.links > .url {
+	background: #4a76a8;
+}
+
+.no-move {
+	transition: transform 0s;
+}
+.ghost {
+	opacity: 0.5;
+	background: #c8ebfb;
+}
+
+.flip-list-move {
+	transition: transform 0.3s;
+}
+
